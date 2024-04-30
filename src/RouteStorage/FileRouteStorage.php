@@ -17,6 +17,11 @@ final class FileRouteStorage implements RouteStorageInterface
     #[\Override]
     public function saveRoute(string $route): void
     {
+        if (!file_exists($this->file)) {
+            touch($this->file);
+        }
+
+        file_put_contents($this->file, "$route\n", \FILE_APPEND);
     }
 
     #[\Override]
@@ -30,6 +35,6 @@ final class FileRouteStorage implements RouteStorageInterface
             throw new \RuntimeException('Unable to load routes from given file.');
         }
 
-        return $routes;
+        return array_unique($routes);
     }
 }

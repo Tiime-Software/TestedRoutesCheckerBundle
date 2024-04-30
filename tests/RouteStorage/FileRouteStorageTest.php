@@ -11,13 +11,13 @@ final class FileRouteStorageTest extends TestCase
 {
     public function testStorage(): void
     {
-        $this->markTestSkipped();
-        // $storage = new FileRouteStorage(__DIR__.'/../../var/cache/test_cache_file');
+        $storage = new FileRouteStorage(__DIR__.'/../../var/cache/test_cache_file');
 
-        // $storage->saveRoute('route1');
-        // $storage->saveRoute('route2');
-        // $storage->saveRoute('route3');
+        $storage->saveRoute('route1');
+        $storage->saveRoute('route2');
+        $storage->saveRoute('route3');
+        $storage->saveRoute('route2');
 
-        // $this->assertSame(['route1', 'route2', 'route3'], $storage->getRoutes());
+        $this->assertSame(['route1', 'route2', 'route3'], $storage->getRoutes());
     }
 }
