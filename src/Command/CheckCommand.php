@@ -10,8 +10,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Routing\RouterInterface;
-use Tiime\TestedRoutesCheckerBundle\RouteStorage\RouteStorageInterface;
+use Tiime\TestedRoutesCheckerBundle\RoutesChecker;
+use Tiime\TestedRoutesCheckerBundle\RouteStorage\FileRouteStorage;
 
 #[AsCommand(
     name: 'tiime:tested-routes-checker:check',
@@ -20,9 +20,9 @@ use Tiime\TestedRoutesCheckerBundle\RouteStorage\RouteStorageInterface;
 class CheckCommand extends Command
 {
     public function __construct(
-        private readonly RouterInterface $router,
-        private readonly RouteStorageInterface $routeStorage,
-        private readonly int $maximumNumberOfNonTestedRoutesToDisplay = 25,
+        private readonly RoutesChecker $routesChecker,
+        private readonly int $maximumNumberOfNonTestedRoutesToDisplay,
+        private readonly string $routesToIgnoreFile,
     ) {
         parent::__construct();
     }
@@ -31,6 +31,7 @@ class CheckCommand extends Command
     {
         $this
             ->addOption('maximum-routes-to-display', 'm', InputOption::VALUE_REQUIRED, 'Maximum number of non tested routes to display', $this->maximumNumberOfNonTestedRoutesToDisplay)
+            ->addOption('routes-to-ignore', 'i', InputOption::VALUE_REQUIRED, 'A file containing routes to ignore', $this->routesToIgnoreFile)
         ;
     }
 
@@ -38,12 +39,17 @@ class CheckCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $testedRoutes = $this->routeStorage->getRoutes();
+        $routesToIgnore = [];
+        try {
+            /** @var string $routesToIgnoreFile */
+            $routesToIgnoreFile = $input->getOption('routes-to-ignore');
+            $routesToIgnore = (new FileRouteStorage($routesToIgnoreFile))->getRoutes();
+        } catch (\InvalidArgumentException $e) {
+        }
 
-        $routes = array_keys($this->router->getRouteCollection()->all());
-        $nonTestedRoutes = array_diff($routes, $testedRoutes);
+        $untestedRoutes = $this->routesChecker->getUntestedRoutes($routesToIgnore);
 
-        if (0 === $count = \count($nonTestedRoutes)) {
+        if (0 === $count = \count($untestedRoutes)) {
             $io->success('Congrats, all routes have been tested!');
 
             return Command::SUCCESS;
@@ -56,14 +62,14 @@ class CheckCommand extends Command
         $max = (int) $input->getOption('maximum-routes-to-display');
 
         if ($count < $max) {
-            $io->listing($nonTestedRoutes);
+            $io->listing($untestedRoutes);
 
             $io->error(sprintf('Found %d non tested route%s!', $count, 1 === $count ? '' : 's'));
 
             return Command::FAILURE;
         }
 
-        $io->listing(\array_slice($nonTestedRoutes, 0, $max));
+        $io->listing(\array_slice($untestedRoutes, 0, $max));
         $io->writeln(sprintf('... and %d more', $count - $max));
 
         $io->error("Found $count non tested routes!");

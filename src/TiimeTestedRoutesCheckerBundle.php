@@ -17,6 +17,7 @@ class TiimeTestedRoutesCheckerBundle extends AbstractBundle
         $definition->rootNode()
             ->children()
                 ->integerNode('maximum_number_of_routes_to_display')->defaultValue(25)->end()
+                ->scalarNode('routes_to_ignore_file')->defaultValue('%kernel.project_dir%/.tiime-trc-baseline')->end()
                 ->scalarNode('route_storage_file')->defaultValue('%kernel.project_dir%/var/cache/tiime_tested_routes_checker_bundle_route_storage')->end()
             ->end()
         ;
@@ -32,6 +33,7 @@ class TiimeTestedRoutesCheckerBundle extends AbstractBundle
         }
 
         $container->parameters()->set('tiime_tested_routes_checker_bundle.maximum_number_of_routes_to_display', $config['maximum_number_of_routes_to_display']);
+        $container->parameters()->set('tiime_tested_routes_checker_bundle.routes_to_ignore_file', $config['routes_to_ignore_file']);
         $container->parameters()->set('tiime_tested_routes_checker_bundle.route_storage_file', $config['route_storage_file']);
     }
 }
