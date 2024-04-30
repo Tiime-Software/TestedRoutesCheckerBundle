@@ -6,13 +6,12 @@ namespace Tiime\TestedRoutesCheckerBundle\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Routing\RouterInterface;
+use Tiime\TestedRoutesCheckerBundle\RouteStorage\RouteStorageInterface;
 
 #[AsCommand(
     name: 'tiime:tested-routes-checker:check',
@@ -20,36 +19,29 @@ use Symfony\Component\Routing\RouterInterface;
 )]
 class CheckCommand extends Command
 {
-    public function __construct(private readonly RouterInterface $router)
-    {
+    public function __construct(
+        private readonly RouterInterface $router,
+        private readonly RouteStorageInterface $routeStorage,
+        private readonly int $maximumNumberOfNonTestedRoutesToDisplay = 25,
+    ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
         $this
-            ->addArgument('file', InputArgument::OPTIONAL, 'The file containing all routes which have been tested', __DIR__.'/../../var/cache/test/tiime_tested_routes')
-            ->addOption('maximum-routes-to-display', 'm', InputOption::VALUE_REQUIRED, 'Maximum number of non tested routes to display', 25)
+            ->addOption('maximum-routes-to-display', 'm', InputOption::VALUE_REQUIRED, 'Maximum number of non tested routes to display', $this->maximumNumberOfNonTestedRoutesToDisplay)
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var string $file */
-        $file = $input->getArgument('file');
+        $io = new SymfonyStyle($input, $output);
 
-        if (!file_exists($file)) {
-            throw new InvalidArgumentException('Given file does not exists!');
-        }
-
-        if (false === $testedRoutes = @file($file, \FILE_IGNORE_NEW_LINES)) {
-            throw new InvalidArgumentException('Unable to load routes from given file.');
-        }
+        $testedRoutes = $this->routeStorage->getRoutes();
 
         $routes = array_keys($this->router->getRouteCollection()->all());
         $nonTestedRoutes = array_diff($routes, $testedRoutes);
-
-        $io = new SymfonyStyle($input, $output);
 
         if (0 === $count = \count($nonTestedRoutes)) {
             $io->success('Congrats, all routes have been tested!');
