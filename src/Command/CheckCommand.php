@@ -35,6 +35,7 @@ class CheckCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var string $file */
         $file = $input->getArgument('file');
 
         if (!file_exists($file)) {
@@ -59,6 +60,7 @@ class CheckCommand extends Command
         $io->writeln('Some routes have not been tested :');
         $io->writeln('');
 
+        /* @phpstan-ignore-next-line */
         $max = (int) $input->getOption('maximum-routes-to-display');
 
         if ($count < $max) {
