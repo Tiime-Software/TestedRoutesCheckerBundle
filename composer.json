@@ -1,0 +1,30 @@
+{
+    "name": "tiime/tested-routes-checker-bundle",
+    "description": "A bundle to ensure all routes of a Symfony application have been tested",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Tiime\\TestedRoutesCheckerBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tiime\\TestedRoutesCheckerBundle\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "symfony/config": "^6.4|^7.0",
+        "symfony/console": "^6.4|^7.0",
+        "symfony/dependency-injection": "^6.4|^7.0",
+        "symfony/http-kernel": "^6.4|^7.0",
+        "symfony/routing": "^6.4|^7.0"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6",
+        "symfony/phpunit-bridge": "^7.0"
+    }
+}
