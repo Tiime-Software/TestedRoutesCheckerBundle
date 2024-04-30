@@ -27,6 +27,10 @@ class TiimeTestedRoutesCheckerBundle extends AbstractBundle
     {
         $container->import('../config/services.php');
 
+        if ('test' === $container->env()) {
+            $container->import('../config/services_test.php');
+        }
+
         $container->parameters()->set('tiime_tested_routes_checker_bundle.maximum_number_of_routes_to_display', $config['maximum_number_of_routes_to_display']);
         $container->parameters()->set('tiime_tested_routes_checker_bundle.route_storage_file', $config['route_storage_file']);
     }
