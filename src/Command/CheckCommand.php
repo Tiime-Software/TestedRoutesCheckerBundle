@@ -95,7 +95,7 @@ class CheckCommand extends Command
                 ->saveRoute(
                     implode(\PHP_EOL, $untestedRoutes)
                 );
-            $io->writeln('Results saved in ' . $routesToIgnoreFile);
+            $io->writeln('Results saved in '.$routesToIgnoreFile);
         }
 
         return Command::FAILURE;
