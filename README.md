@@ -2,6 +2,11 @@
 
 A bundle to ensure all routes of a Symfony application have been tested.
 
+## How it works?
+
+1. Launch your tests using PHPUnit or anything else. All called routes will be stored in `var/cache/tiime_tested_routes_checker_bundle_route_storage`.
+2. Run `php bin/console tiime:tested-routes-checker:check` to have a small report of what's tested and what's not!
+
 ## Installation
 
 Make sure Composer is installed globally, as explained in the [installation
