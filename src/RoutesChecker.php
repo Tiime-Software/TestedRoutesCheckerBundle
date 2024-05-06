@@ -35,7 +35,7 @@ final class RoutesChecker
                 continue;
             }
             foreach ($routesToIgnore as $routeToIgnore) {
-                if (@preg_match("#$routeToIgnore#", $untestedRoute)) {
+                if (@preg_match("#\b$routeToIgnore\b#", $untestedRoute)) {
                     continue 2;
                 }
             }
