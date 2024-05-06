@@ -45,6 +45,7 @@ class CheckCommand extends Command
             $routesToIgnoreFile = $input->getOption('routes-to-ignore');
             $routesToIgnore = (new FileRouteStorage($routesToIgnoreFile))->getRoutes();
         } catch (\InvalidArgumentException $e) {
+            $io->warning('Unable to load the given file containing routes to ignore.');
         }
 
         $untestedRoutes = $this->routesChecker->getUntestedRoutes($routesToIgnore);
