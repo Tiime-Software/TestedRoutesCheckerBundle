@@ -49,11 +49,19 @@ class CheckCommand extends Command
             $fileRouteStorage->setFile($routesToIgnoreFile);
             $routesToIgnore = $fileRouteStorage->getRoutes();
         } catch (\InvalidArgumentException $e) {
+            $io->warning('Unable to load the given file containing routes to ignore.');
         }
 
         $untestedRoutes = $this->routesChecker->getUntestedRoutes($routesToIgnore);
+        $testedIgnoredRoutes = $this->routesChecker->getTestedIgnoredRoutes($routesToIgnore);
 
         if (0 === $count = \count($untestedRoutes)) {
+            if (0 < \count($testedIgnoredRoutes)) {
+                $this->showTestedIgnoredRoutesSection($io, $testedIgnoredRoutes);
+
+                return Command::FAILURE;
+            }
+
             $io->success('Congrats, all routes have been tested!');
 
             return Command::SUCCESS;
@@ -70,6 +78,8 @@ class CheckCommand extends Command
 
             $io->error(sprintf('Found %d non tested route%s!', $count, 1 === $count ? '' : 's'));
 
+            $this->showTestedIgnoredRoutesSection($io, $testedIgnoredRoutes);
+
             return Command::FAILURE;
         }
 
@@ -77,6 +87,8 @@ class CheckCommand extends Command
         $io->writeln(sprintf('... and %d more', $count - $max));
 
         $io->error("Found $count non tested routes!");
+
+        $this->showTestedIgnoredRoutesSection($io, $testedIgnoredRoutes);
 
         if ($input->getOption('generate-baseline')) {
             $fileRouteStorage
@@ -87,5 +99,18 @@ class CheckCommand extends Command
         }
 
         return Command::FAILURE;
+    }
+
+    /**
+     * @param string[] $testedIgnoredRoutes
+     */
+    private function showTestedIgnoredRoutesSection(SymfonyStyle $io, array $testedIgnoredRoutes): void
+    {
+        if (0 === \count($testedIgnoredRoutes)) {
+            return;
+        }
+
+        $io->warning('Some ignored routes looks tested, you should remove them from baseline!');
+        $io->listing($testedIgnoredRoutes);
     }
 }

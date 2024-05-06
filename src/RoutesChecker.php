@@ -47,6 +47,20 @@ final class RoutesChecker
     }
 
     /**
+     * Return ignored routes which are tested.
+     *
+     * @param string[] $routesToIgnore
+     *
+     * @return string[]
+     */
+    public function getTestedIgnoredRoutes(array $routesToIgnore = []): array
+    {
+        $testedRoutes = $this->routeStorage->getRoutes();
+
+        return array_values(array_intersect($testedRoutes, $routesToIgnore));
+    }
+
+    /**
      * @return string[]
      */
     private function getDefaultRoutesToIgnore(): array
