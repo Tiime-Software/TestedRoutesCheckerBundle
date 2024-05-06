@@ -32,6 +32,7 @@ class CheckCommand extends Command
         $this
             ->addOption('maximum-routes-to-display', 'm', InputOption::VALUE_REQUIRED, 'Maximum number of non tested routes to display', $this->maximumNumberOfNonTestedRoutesToDisplay)
             ->addOption('routes-to-ignore', 'i', InputOption::VALUE_REQUIRED, 'A file containing routes to ignore', $this->routesToIgnoreFile)
+            ->addOption('generate-baseline', 'g', InputOption::VALUE_NONE, 'Generate the file containing the routes to be ignored');
         ;
     }
 
@@ -73,6 +74,17 @@ class CheckCommand extends Command
         $io->writeln(sprintf('... and %d more', $count - $max));
 
         $io->error("Found $count non tested routes!");
+
+        if ($input->getOption('generate-baseline')) {
+            try {
+                (new FileRouteStorage($this->routesToIgnoreFile))
+                    ->saveRoute(
+                        implode(PHP_EOL, $untestedRoutes)
+                    );
+                $io->writeln("Results saved in " . $this->routesToIgnoreFile);
+            } catch (\Exception $e) {
+            }
+        }
 
         return Command::FAILURE;
     }
