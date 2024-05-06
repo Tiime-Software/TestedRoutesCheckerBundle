@@ -41,12 +41,12 @@ class CheckCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $routesToIgnore = [];
-        $fileRouteStorage = new FileRouteStorage($this->routesToIgnoreFile);
+
+        /** @var string $routesToIgnoreFile */
+        $routesToIgnoreFile = $input->getOption('routes-to-ignore');
+        $fileRouteStorage = new FileRouteStorage($routesToIgnoreFile);
 
         try {
-            /** @var string $routesToIgnoreFile */
-            $routesToIgnoreFile = $input->getOption('routes-to-ignore');
-            $fileRouteStorage->setFile($routesToIgnoreFile);
             $routesToIgnore = $fileRouteStorage->getRoutes();
         } catch (\InvalidArgumentException $e) {
             $io->warning('Unable to load the given file containing routes to ignore.');
@@ -95,7 +95,7 @@ class CheckCommand extends Command
                 ->saveRoute(
                     implode(\PHP_EOL, $untestedRoutes)
                 );
-            $io->writeln('Results saved in '.$fileRouteStorage->getFile());
+            $io->writeln('Results saved in ' . $routesToIgnoreFile);
         }
 
         return Command::FAILURE;

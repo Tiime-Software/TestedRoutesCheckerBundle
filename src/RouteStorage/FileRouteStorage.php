@@ -10,7 +10,7 @@ namespace Tiime\TestedRoutesCheckerBundle\RouteStorage;
 final class FileRouteStorage implements RouteStorageInterface
 {
     public function __construct(
-        private string $file,
+        private readonly string $file,
     ) {
     }
 
@@ -36,15 +36,5 @@ final class FileRouteStorage implements RouteStorageInterface
         }
 
         return array_unique($routes);
-    }
-
-    public function setFile(string $file): void
-    {
-        $this->file = $file;
-    }
-
-    public function getFile(): string
-    {
-        return $this->file;
     }
 }
