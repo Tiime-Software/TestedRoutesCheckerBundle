@@ -83,7 +83,7 @@ class CheckCommand extends Command
                 ->saveRoute(
                     implode(\PHP_EOL, $untestedRoutes)
                 );
-            $io->writeln("Results saved in " . $fileRouteStorage->getFile());
+            $io->writeln('Results saved in '.$fileRouteStorage->getFile());
         }
 
         return Command::FAILURE;
