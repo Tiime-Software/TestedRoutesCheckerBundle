@@ -32,7 +32,7 @@ class CheckCommand extends Command
         $this
             ->addOption('maximum-routes-to-display', 'm', InputOption::VALUE_REQUIRED, 'Maximum number of non tested routes to display', $this->maximumNumberOfNonTestedRoutesToDisplay)
             ->addOption('routes-to-ignore', 'i', InputOption::VALUE_REQUIRED, 'A file containing routes to ignore', $this->routesToIgnoreFile)
-            ->addOption('generate-baseline', 'g', InputOption::VALUE_NONE, 'Generate the file containing the routes to be ignored');
+            ->addOption('generate-baseline', 'g', InputOption::VALUE_NONE, 'Generate the file containing the routes to be ignored')
         ;
     }
 
@@ -41,10 +41,13 @@ class CheckCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $routesToIgnore = [];
+        $fileRouteStorage = new FileRouteStorage($this->routesToIgnoreFile);
+
         try {
             /** @var string $routesToIgnoreFile */
             $routesToIgnoreFile = $input->getOption('routes-to-ignore');
-            $routesToIgnore = (new FileRouteStorage($routesToIgnoreFile))->getRoutes();
+            $fileRouteStorage->setFile($routesToIgnoreFile);
+            $routesToIgnore = $fileRouteStorage->getRoutes();
         } catch (\InvalidArgumentException $e) {
         }
 
@@ -76,14 +79,11 @@ class CheckCommand extends Command
         $io->error("Found $count non tested routes!");
 
         if ($input->getOption('generate-baseline')) {
-            try {
-                (new FileRouteStorage($this->routesToIgnoreFile))
-                    ->saveRoute(
-                        implode(PHP_EOL, $untestedRoutes)
-                    );
-                $io->writeln("Results saved in " . $this->routesToIgnoreFile);
-            } catch (\Exception $e) {
-            }
+            $fileRouteStorage
+                ->saveRoute(
+                    implode(\PHP_EOL, $untestedRoutes)
+                );
+            $io->writeln("Results saved in " . $fileRouteStorage->getFile());
         }
 
         return Command::FAILURE;
