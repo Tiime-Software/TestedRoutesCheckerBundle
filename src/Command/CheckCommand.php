@@ -32,6 +32,7 @@ class CheckCommand extends Command
         $this
             ->addOption('maximum-routes-to-display', 'm', InputOption::VALUE_REQUIRED, 'Maximum number of non tested routes to display', $this->maximumNumberOfNonTestedRoutesToDisplay)
             ->addOption('routes-to-ignore', 'i', InputOption::VALUE_REQUIRED, 'A file containing routes to ignore', $this->routesToIgnoreFile)
+            ->addOption('generate-baseline', 'g', InputOption::VALUE_NONE, 'Generate the file containing the routes to be ignored')
         ;
     }
 
@@ -40,10 +41,13 @@ class CheckCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $routesToIgnore = [];
+
+        /** @var string $routesToIgnoreFile */
+        $routesToIgnoreFile = $input->getOption('routes-to-ignore');
+        $fileRouteStorage = new FileRouteStorage($routesToIgnoreFile);
+
         try {
-            /** @var string $routesToIgnoreFile */
-            $routesToIgnoreFile = $input->getOption('routes-to-ignore');
-            $routesToIgnore = (new FileRouteStorage($routesToIgnoreFile))->getRoutes();
+            $routesToIgnore = $fileRouteStorage->getRoutes();
         } catch (\InvalidArgumentException $e) {
             $io->warning('Unable to load the given file containing routes to ignore.');
         }
@@ -85,6 +89,14 @@ class CheckCommand extends Command
         $io->error("Found $count non tested routes!");
 
         $this->showTestedIgnoredRoutesSection($io, $testedIgnoredRoutes);
+
+        if ($input->getOption('generate-baseline')) {
+            $fileRouteStorage
+                ->saveRoute(
+                    implode(\PHP_EOL, $untestedRoutes)
+                );
+            $io->writeln('Results saved in '.$routesToIgnoreFile);
+        }
 
         return Command::FAILURE;
     }
