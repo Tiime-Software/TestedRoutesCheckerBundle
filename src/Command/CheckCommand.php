@@ -73,20 +73,13 @@ class CheckCommand extends Command
         /* @phpstan-ignore-next-line */
         $max = (int) $input->getOption('maximum-routes-to-display');
 
-        if ($count < $max) {
-            $io->listing($untestedRoutes);
+        $io->listing(\array_slice($untestedRoutes, 0, $max));
 
-            $io->error(sprintf('Found %d non tested route%s!', $count, 1 === $count ? '' : 's'));
-
-            $this->showTestedIgnoredRoutesSection($io, $testedIgnoredRoutes);
-
-            return Command::FAILURE;
+        if ($count > $max) {
+            $io->writeln(sprintf('... and %d more', $count - $max));
         }
 
-        $io->listing(\array_slice($untestedRoutes, 0, $max));
-        $io->writeln(sprintf('... and %d more', $count - $max));
-
-        $io->error("Found $count non tested routes!");
+        $io->error(sprintf('Found %d non tested route%s!', $count, 1 === $count ? '' : 's'));
 
         $this->showTestedIgnoredRoutesSection($io, $testedIgnoredRoutes);
 
@@ -95,7 +88,7 @@ class CheckCommand extends Command
                 ->saveRoute(
                     implode(\PHP_EOL, $untestedRoutes)
                 );
-            $io->writeln('Results saved in '.$routesToIgnoreFile);
+            $io->writeln(sprintf('Results saved in %s', $routesToIgnoreFile));
         }
 
         return Command::FAILURE;
