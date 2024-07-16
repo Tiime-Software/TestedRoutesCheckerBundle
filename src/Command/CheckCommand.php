@@ -10,8 +10,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Tiime\TestedRoutesCheckerBundle\IgnoredRoutesStorage;
 use Tiime\TestedRoutesCheckerBundle\RoutesChecker;
-use Tiime\TestedRoutesCheckerBundle\RouteStorage\FileRouteStorage;
 
 #[AsCommand(
     name: 'tiime:tested-routes-checker:check',
@@ -44,10 +44,10 @@ class CheckCommand extends Command
 
         /** @var string $routesToIgnoreFile */
         $routesToIgnoreFile = $input->getOption('routes-to-ignore');
-        $fileRouteStorage = new FileRouteStorage($routesToIgnoreFile);
+        $ignoredRoutesStorage = new IgnoredRoutesStorage($routesToIgnoreFile);
 
         try {
-            $routesToIgnore = $fileRouteStorage->getRoutes();
+            $routesToIgnore = $ignoredRoutesStorage->getRoutes();
         } catch (\InvalidArgumentException $e) {
             $io->warning('Unable to load the given file containing routes to ignore.');
         }
@@ -84,7 +84,7 @@ class CheckCommand extends Command
         $this->showTestedIgnoredRoutesSection($io, $testedIgnoredRoutes);
 
         if ($input->getOption('generate-baseline')) {
-            $fileRouteStorage
+            $ignoredRoutesStorage
                 ->saveRoute(
                     implode(\PHP_EOL, $untestedRoutes)
                 );

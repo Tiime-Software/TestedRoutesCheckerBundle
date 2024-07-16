@@ -24,7 +24,7 @@ final class RoutesChecker
     {
         $routesToIgnore = array_merge($this->getDefaultRoutesToIgnore(), $routesToIgnore);
 
-        $testedRoutes = $this->routeStorage->getRoutes();
+        $testedRoutes = array_keys($this->routeStorage->getRoutes());
 
         $routes = array_keys($this->router->getRouteCollection()->all());
         $untestedRoutes = array_diff($routes, $testedRoutes);
@@ -55,7 +55,7 @@ final class RoutesChecker
      */
     public function getTestedIgnoredRoutes(array $routesToIgnore = []): array
     {
-        $testedRoutes = $this->routeStorage->getRoutes();
+        $testedRoutes = array_keys($this->routeStorage->getRoutes());
 
         return array_values(array_intersect($testedRoutes, $routesToIgnore));
     }

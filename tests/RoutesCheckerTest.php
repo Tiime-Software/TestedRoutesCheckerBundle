@@ -28,7 +28,7 @@ final class RoutesCheckerTest extends TestCase
     {
         $this->routeStorage->expects($this->once())
                 ->method('getRoutes')
-                ->willReturn(['route1', 'route2']);
+                ->willReturn(['route1' => [200], 'route2' => [404]]);
 
         $testedIgnoredRoutes = $this->routesChecker->getTestedIgnoredRoutes(['route2', 'route3']);
 

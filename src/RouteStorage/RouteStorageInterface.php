@@ -9,10 +9,13 @@ namespace Tiime\TestedRoutesCheckerBundle\RouteStorage;
  */
 interface RouteStorageInterface
 {
-    public function saveRoute(string $route): void;
+    public function saveRoute(string $route, int $statusCode): void;
 
     /**
-     * @return string[]
+     * Return an array with the route name as key and all known return codes
+     * (including duplicates).
+     *
+     * @return array<string, int[]>
      */
     public function getRoutes(): array;
 }

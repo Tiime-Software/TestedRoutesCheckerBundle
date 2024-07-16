@@ -20,6 +20,10 @@ final class KernelRequestListener
             return;
         }
 
-        $this->routeStorage->saveRoute($routeName);
+        if (null === $response = $event->getResponse()) {
+            return;
+        }
+
+        $this->routeStorage->saveRoute($routeName, $response->getStatusCode());
     }
 }
