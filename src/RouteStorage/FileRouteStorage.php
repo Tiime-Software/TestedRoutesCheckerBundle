@@ -15,13 +15,13 @@ final class FileRouteStorage implements RouteStorageInterface
     }
 
     #[\Override]
-    public function saveRoute(string $route): void
+    public function saveRoute(string $route, int $statusCode): void
     {
         if (!file_exists($this->file)) {
             touch($this->file);
         }
 
-        file_put_contents($this->file, "$route\n", \FILE_APPEND);
+        file_put_contents($this->file, "$route|$statusCode\n", \FILE_APPEND);
     }
 
     #[\Override]
@@ -35,6 +35,23 @@ final class FileRouteStorage implements RouteStorageInterface
             throw new \RuntimeException('Unable to load routes from given file.');
         }
 
-        return array_unique($routes);
+        $filteredRoutes = [];
+
+        foreach ($routes as $route) {
+            $parts = explode('|', $route);
+
+            $name = $parts[0];
+            // In order to avoid BC break, we consider a route without a status code as a 200 OK.
+            // To be removed in 2.0
+            $statusCode = (int) ($parts[1] ?? 200);
+
+            if (!\array_key_exists($name, $filteredRoutes)) {
+                $filteredRoutes[$name] = [$statusCode];
+            } else {
+                $filteredRoutes[$name][] = $statusCode;
+            }
+        }
+
+        return $filteredRoutes;
     }
 }
