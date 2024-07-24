@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tiime\TestedRoutesCheckerBundle\EventListener;
 
-use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Tiime\TestedRoutesCheckerBundle\RouteStorage\RouteStorageInterface;
 
 final class KernelRequestListener
@@ -14,16 +14,12 @@ final class KernelRequestListener
     ) {
     }
 
-    public function __invoke(RequestEvent $event): void
+    public function __invoke(ResponseEvent $event): void
     {
         if ('' === $routeName = $event->getRequest()->attributes->getString('_route')) {
             return;
         }
 
-        if (null === $response = $event->getResponse()) {
-            return;
-        }
-
-        $this->routeStorage->saveRoute($routeName, $response->getStatusCode());
+        $this->routeStorage->saveRoute($routeName, $event->getResponse()->getStatusCode());
     }
 }
