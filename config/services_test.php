@@ -13,6 +13,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('tiime_tested_routes_checker_bundle.route_storage.file'),
             ])
-            ->tag('kernel.event_listener', ['event' => KernelEvents::REQUEST])
+            ->tag('kernel.event_listener', ['event' => KernelEvents::RESPONSE])
     ;
 };
