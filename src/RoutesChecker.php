@@ -7,7 +7,7 @@ namespace Tiime\TestedRoutesCheckerBundle;
 use Symfony\Component\Routing\RouterInterface;
 use Tiime\TestedRoutesCheckerBundle\RouteStorage\RouteStorageInterface;
 
-final class RoutesChecker
+class RoutesChecker
 {
     public function __construct(
         private readonly RouterInterface $router,
