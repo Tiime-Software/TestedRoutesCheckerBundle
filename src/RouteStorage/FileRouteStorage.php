@@ -28,7 +28,7 @@ final class FileRouteStorage implements RouteStorageInterface
     public function getRoutes(): array
     {
         if (!file_exists($this->file)) {
-            throw new \InvalidArgumentException("File \"{$this->file}\"does not exists, did you correclty run tests?");
+            throw new \InvalidArgumentException("File \"{$this->file}\" does not exists, did you correclty run tests?");
         }
 
         if (false === $routes = @file($this->file, \FILE_IGNORE_NEW_LINES)) {
