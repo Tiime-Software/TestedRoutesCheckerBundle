@@ -6,6 +6,7 @@ namespace Tiime\TestedRoutesCheckerBundle\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Tiime\TestedRoutesCheckerBundle\Command\CheckCommand;
 
 final class FunctionalTest extends TestCase
 {
@@ -30,5 +31,8 @@ final class FunctionalTest extends TestCase
 
         $removedServices = array_keys($container->getRemovedIds());
         $this->assertTrue(\in_array('tiime_tested_routes_checker_bundle.command.check', $removedServices));
+
+        $command = $container->get(CheckCommand::class);
+        $this->assertInstanceOf(CheckCommand::class, $command);
     }
 }
