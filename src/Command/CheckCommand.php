@@ -33,6 +33,7 @@ class CheckCommand extends Command
             ->addOption('maximum-routes-to-display', 'm', InputOption::VALUE_REQUIRED, 'Maximum number of non tested routes to display', $this->maximumNumberOfNonTestedRoutesToDisplay)
             ->addOption('routes-to-ignore', 'i', InputOption::VALUE_REQUIRED, 'A file containing routes to ignore', $this->routesToIgnoreFile)
             ->addOption('generate-baseline', 'g', InputOption::VALUE_NONE, 'Generate the file containing the routes to be ignored')
+            ->addOption('ignore-not-successfully-tested-routes', 'S', InputOption::VALUE_NONE, 'Does not fail if a route have not been successfully tested (never returned a 1xx, 2xx or 3xx code).')
         ;
     }
 
@@ -54,12 +55,19 @@ class CheckCommand extends Command
 
         $untestedRoutes = $this->routesChecker->getUntestedRoutes($routesToIgnore);
         $testedIgnoredRoutes = $this->routesChecker->getTestedIgnoredRoutes($routesToIgnore);
+        $notSuccessfullyTestedRoutes = $this->routesChecker->getNotSuccessfullyTestedRoutes($routesToIgnore);
 
         if (0 === $count = \count($untestedRoutes)) {
             if (0 < \count($testedIgnoredRoutes)) {
                 $this->showTestedIgnoredRoutesSection($io, $testedIgnoredRoutes);
 
                 return Command::FAILURE;
+            }
+
+            if (0 < \count($notSuccessfullyTestedRoutes)) {
+                $this->showNotSuccessfullyTestedRoutes($io, $notSuccessfullyTestedRoutes);
+
+                return $input->getOption('ignore-not-successfully-tested-routes') ? Command::SUCCESS : Command::FAILURE;
             }
 
             $io->success('Congrats, all routes have been tested!');
@@ -76,10 +84,12 @@ class CheckCommand extends Command
         $io->listing(\array_slice($untestedRoutes, 0, $max));
 
         if ($count > $max) {
-            $io->writeln(sprintf('... and %d more', $count - $max));
+            $io->writeln(\sprintf('... and %d more', $count - $max));
         }
 
-        $io->error(sprintf('Found %d non tested route%s!', $count, 1 === $count ? '' : 's'));
+        $io->error(\sprintf('Found %d non tested route%s!', $count, 1 === $count ? '' : 's'));
+
+        $this->showNotSuccessfullyTestedRoutes($io, $testedIgnoredRoutes);
 
         $this->showTestedIgnoredRoutesSection($io, $testedIgnoredRoutes);
 
@@ -88,7 +98,11 @@ class CheckCommand extends Command
                 ->saveRoute(
                     implode(\PHP_EOL, $untestedRoutes)
                 );
-            $io->writeln(sprintf('Results saved in %s', $routesToIgnoreFile));
+            $io->writeln(\sprintf('Results saved in %s', $routesToIgnoreFile));
+        }
+
+        if (0 < \count($notSuccessfullyTestedRoutes)) {
+            return $input->getOption('ignore-not-successfully-tested-routes') ? Command::SUCCESS : Command::FAILURE;
         }
 
         return Command::FAILURE;
@@ -105,5 +119,18 @@ class CheckCommand extends Command
 
         $io->warning('Some ignored routes looks tested, you should remove them from baseline!');
         $io->listing($testedIgnoredRoutes);
+    }
+
+    /**
+     * @param string[] $notSuccessfullyTestedRoutes
+     */
+    private function showNotSuccessfullyTestedRoutes(SymfonyStyle $io, array $notSuccessfullyTestedRoutes): void
+    {
+        if (0 === \count($notSuccessfullyTestedRoutes)) {
+            return;
+        }
+
+        $io->warning(\sprintf('Found %d routes which are not successfully tested (they never returned a 1xx, 2xx or 3xx code).', \count($notSuccessfullyTestedRoutes)));
+        $io->listing($notSuccessfullyTestedRoutes);
     }
 }

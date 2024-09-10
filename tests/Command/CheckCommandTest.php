@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tiime\TestedRoutesCheckerBundle\Tests\RouteStorage;
+namespace Tiime\TestedRoutesCheckerBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -15,6 +15,7 @@ final class CheckCommandTest extends TestCase
     {
         $routesChecker = $this->createMock(RoutesChecker::class);
         $routesChecker->expects($this->once())->method('getUntestedRoutes')->willReturn([]);
+        $routesChecker->expects($this->once())->method('getNotSuccessfullyTestedRoutes')->willReturn([]);
 
         $commandTester = new CommandTester(new CheckCommand($routesChecker, 10, __DIR__.'/ignored_routes'));
 
@@ -30,6 +31,7 @@ final class CheckCommandTest extends TestCase
     {
         $routesChecker = $this->createMock(RoutesChecker::class);
         $routesChecker->expects($this->once())->method('getUntestedRoutes')->willReturn(['route1', 'route2']);
+        $routesChecker->expects($this->once())->method('getNotSuccessfullyTestedRoutes')->willReturn([]);
 
         $commandTester = new CommandTester(new CheckCommand($routesChecker, 10, __DIR__.'/ignored_routes'));
 
@@ -39,5 +41,21 @@ final class CheckCommandTest extends TestCase
 
         $output = $commandTester->getDisplay();
         $this->assertStringContainsString('[ERROR] Found 2 non tested routes!', $output);
+    }
+
+    public function testWithNotSuccessfullyTestedRoutes(): void
+    {
+        $routesChecker = $this->createMock(RoutesChecker::class);
+        $routesChecker->expects($this->once())->method('getUntestedRoutes')->willReturn([]);
+        $routesChecker->expects($this->once())->method('getNotSuccessfullyTestedRoutes')->willReturn(['route3', 'route4']);
+
+        $commandTester = new CommandTester(new CheckCommand($routesChecker, 10, __DIR__.'/ignored_routes'));
+
+        $commandTester->execute([]);
+
+        $this->assertSame(1, $commandTester->getStatusCode());
+
+        $output = $commandTester->getDisplay();
+        $this->assertStringContainsString('[WARNING] Found 2 routes which are not successfully tested', $output);
     }
 }

@@ -29,21 +29,7 @@ class RoutesChecker
         $routes = array_keys($this->router->getRouteCollection()->all());
         $untestedRoutes = array_diff($routes, $testedRoutes);
 
-        $filteredRoutes = [];
-        foreach ($untestedRoutes as $untestedRoute) {
-            if (\in_array($untestedRoute, $routesToIgnore)) {
-                continue;
-            }
-            foreach ($routesToIgnore as $routeToIgnore) {
-                if (@preg_match("#\b$routeToIgnore\b#", $untestedRoute)) {
-                    continue 2;
-                }
-            }
-
-            $filteredRoutes[] = $untestedRoute;
-        }
-
-        return $filteredRoutes;
+        return $this->filterRoutesWithRoutesToIgnore($untestedRoutes, $routesToIgnore);
     }
 
     /**
@@ -61,6 +47,36 @@ class RoutesChecker
     }
 
     /**
+     * Return not successfully tested routes.
+     *
+     * A route is considered non fully tested when it never return a successful
+     * code during test execution.
+     *
+     * - a successful code is a 1xx, 2xx or 3xx code.
+     * - if the route have been tested several times with at least 1 successful
+     * code: it's considered successfully tested.
+     *
+     * @param string[] $routesToIgnore
+     *
+     * @return string[]
+     */
+    public function getNotSuccessfullyTestedRoutes(array $routesToIgnore = []): array
+    {
+        // Filter all routes wich have been successfully tested at least once.
+        $routes = array_keys(array_filter($this->routeStorage->getRoutes(), static function (array $responseCodes): bool {
+            foreach ($responseCodes as $responseCode) {
+                if ($responseCode < 400) {
+                    return false;
+                }
+            }
+
+            return true;
+        }));
+
+        return $this->filterRoutesWithRoutesToIgnore($routes, $routesToIgnore);
+    }
+
+    /**
      * @return string[]
      */
     private function getDefaultRoutesToIgnore(): array
@@ -72,5 +88,30 @@ class RoutesChecker
             '_preview_error',
             'app.swagger',
         ];
+    }
+
+    /**
+     * @param string[] $routes
+     * @param string[] $routesToIgnore
+     *
+     * @return string[]
+     */
+    private function filterRoutesWithRoutesToIgnore(array $routes, array $routesToIgnore): array
+    {
+        $filteredRoutes = [];
+        foreach ($routes as $route) {
+            if (\in_array($route, $routesToIgnore)) {
+                continue;
+            }
+            foreach ($routesToIgnore as $routeToIgnore) {
+                if (@preg_match("#\b$routeToIgnore\b#", $route)) {
+                    continue 2;
+                }
+            }
+
+            $filteredRoutes[] = $route;
+        }
+
+        return $filteredRoutes;
     }
 }

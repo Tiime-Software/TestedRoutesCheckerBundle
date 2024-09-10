@@ -34,4 +34,15 @@ final class RoutesCheckerTest extends TestCase
 
         $this->assertSame(['route2'], $testedIgnoredRoutes);
     }
+
+    public function testGetNotFullyTesteRoutes(): void
+    {
+        $this->routeStorage->expects($this->once())
+                ->method('getRoutes')
+                ->willReturn(['route1' => [200], 'route2' => [404], 'route3' => [500]]);
+
+        $routes = $this->routesChecker->getNotSuccessfullyTestedRoutes(['route2', 'route4']);
+
+        $this->assertSame(['route3'], $routes);
+    }
 }
