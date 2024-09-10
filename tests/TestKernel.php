@@ -6,8 +6,10 @@ namespace Tiime\TestedRoutesCheckerBundle\Tests;
 
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
+use Tiime\TestedRoutesCheckerBundle\Command\CheckCommand;
 use Tiime\TestedRoutesCheckerBundle\TiimeTestedRoutesCheckerBundle;
 
 class TestKernel extends Kernel
@@ -30,6 +32,16 @@ class TestKernel extends Kernel
         $loader->load(function (ContainerBuilder $container) {
             foreach ($this->config as $extension => $config) {
                 $container->loadFromExtension($extension, $config);
+            }
+        });
+    }
+
+    public function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new class() implements CompilerPassInterface {
+            public function process(ContainerBuilder $container): void
+            {
+                $container->setAlias(CheckCommand::class, 'tiime_tested_routes_checker_bundle.command.check')->setPublic(true);
             }
         });
     }
