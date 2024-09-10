@@ -54,8 +54,8 @@ class CheckCommand extends Command
         }
 
         $untestedRoutes = $this->routesChecker->getUntestedRoutes($routesToIgnore);
-        $testedIgnoredRoutes = $this->routesChecker->getTestedIgnoredRoutes($routesToIgnore);
         $notSuccessfullyTestedRoutes = $this->routesChecker->getNotSuccessfullyTestedRoutes($routesToIgnore);
+        $testedIgnoredRoutes = $this->routesChecker->getTestedIgnoredRoutes(array_merge($routesToIgnore, $notSuccessfullyTestedRoutes));
 
         if (0 === $count = \count($untestedRoutes)) {
             if (0 < \count($testedIgnoredRoutes)) {

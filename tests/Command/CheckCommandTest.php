@@ -46,7 +46,6 @@ final class CheckCommandTest extends TestCase
     public function testWithNotSuccessfullyTestedRoutes(): void
     {
         $routesChecker = $this->createMock(RoutesChecker::class);
-        $routesChecker->expects($this->once())->method('getUntestedRoutes')->willReturn([]);
         $routesChecker->expects($this->once())->method('getNotSuccessfullyTestedRoutes')->willReturn(['route3', 'route4']);
 
         $commandTester = new CommandTester(new CheckCommand($routesChecker, 10, __DIR__.'/ignored_routes'));
@@ -57,5 +56,20 @@ final class CheckCommandTest extends TestCase
 
         $output = $commandTester->getDisplay();
         $this->assertStringContainsString('[WARNING] Found 2 routes which are not successfully tested', $output);
+    }
+
+    public function testWithTestedIgnoredRoutes(): void
+    {
+        $routesChecker = $this->createMock(RoutesChecker::class);
+        $routesChecker->expects($this->once())->method('getTestedIgnoredRoutes')->willReturn(['route2']);
+
+        $commandTester = new CommandTester(new CheckCommand($routesChecker, 10, __DIR__.'/ignored_routes'));
+
+        $commandTester->execute([]);
+
+        $this->assertSame(1, $commandTester->getStatusCode());
+
+        $output = $commandTester->getDisplay();
+        $this->assertStringContainsString('[WARNING] Some ignored routes looks tested', $output);
     }
 }
