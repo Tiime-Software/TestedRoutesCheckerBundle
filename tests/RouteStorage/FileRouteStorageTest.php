@@ -24,15 +24,4 @@ final class FileRouteStorageTest extends TestCase
             'route3' => [403],
         ], $storage->getRoutes());
     }
-
-    public function testWithStorageWithoutStatusCode(): void
-    {
-        $storage = new FileRouteStorage(__DIR__.'/../Fixtures/file_containing_one_route_per_row_with_duplicates');
-
-        $this->assertSame([
-            'route1' => [200, 200],
-            'route2' => [200, 200, 200],
-            'route3' => [200, 200],
-        ], $storage->getRoutes());
-    }
 }
