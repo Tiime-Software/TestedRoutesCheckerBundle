@@ -40,10 +40,12 @@ final class FileRouteStorage implements RouteStorageInterface
         foreach ($routes as $route) {
             $parts = explode('|', $route);
 
+            if (2 !== \count($parts)) {
+                throw new \RuntimeException("It looks like the given file ({$this->file}) does not contains valid data. Consider removing it.");
+            }
+
             $name = $parts[0];
-            // In order to avoid BC break, we consider a route without a status code as a 200 OK.
-            // To be removed in 2.0
-            $statusCode = (int) ($parts[1] ?? 200);
+            $statusCode = (int) $parts[1];
 
             if (!\array_key_exists($name, $filteredRoutes)) {
                 $filteredRoutes[$name] = [$statusCode];
