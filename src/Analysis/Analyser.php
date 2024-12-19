@@ -79,7 +79,7 @@ class Analyser
     {
         return [
             '^_profiler.*$',
-            '_wdt',
+            '_wdt*',
             '_webhook_controller',
             '_preview_error',
             'app.swagger',
