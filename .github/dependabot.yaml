@@ -18,3 +18,21 @@ updates:
       labels:
           - "php"
           - "dependencies"
+
+    # Maintain dependencies for PHP CS Fixer
+    - package-ecosystem: "composer"
+      directory: "/tools/php-cs-fixer/"
+      schedule:
+          interval: "monthly"
+      labels:
+          - "php"
+          - "dependencies"
+
+    # Maintain dependencies for PHPStan
+    - package-ecosystem: "composer"
+      directory: "/tools/phpstan/"
+      schedule:
+          interval: "monthly"
+      labels:
+          - "php"
+          - "dependencies"
