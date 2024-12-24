@@ -23,6 +23,7 @@ final class AnalyserTest extends TestCase
         $routeCollection->add('route3', new Route('/route3'));
         $routeCollection->add('ignored_route1', new Route('/ignored_route1'));
         $routeCollection->add('_wdt', new Route('/_wdt'));
+        $routeCollection->add('_wdt_stylesheet', new Route('/_wdt_stylesheet'));
 
         /** @var RouterInterface&MockObject $router */
         $router = $this->createMock(RouterInterface::class);
