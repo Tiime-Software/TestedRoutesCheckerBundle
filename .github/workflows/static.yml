@@ -7,23 +7,23 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
+          php-version: 8.4
 
       - name: Download dependencies
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v4
 
       - name: Install PHPStan
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v4
         with:
-          composer-options: "--working-dir=tools/phpstan"
+          working-directory: "tools/phpstan"
 
       - name: PHPStan
-        run: tools/phpstan/vendor/bin/phpstan analyze --no-progress --error-format=checkstyle
+        run: tools/phpstan/vendor/bin/phpstan analyze --no-progress
 
   php-cs-fixer:
     name: PHP-CS-Fixer
@@ -31,17 +31,17 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
+          php-version: 8.4
 
       - name: Install php-cs-fixer
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v4
         with:
-          composer-options: "--working-dir=tools/php-cs-fixer"
+          working-directory: "tools/php-cs-fixer"
 
       - name: PHP-CS-Fixer
         run: tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php
@@ -57,10 +57,10 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
+          php-version: 8.4
 
       - name: Download dependencies
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v4
 
       - name: Lint Composer config
         shell: bash

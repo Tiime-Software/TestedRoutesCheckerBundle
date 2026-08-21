@@ -7,10 +7,10 @@ namespace Tiime\TestedRoutesCheckerBundle\EventListener;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Tiime\TestedRoutesCheckerBundle\RouteStorage\RouteStorageInterface;
 
-final class KernelRequestListener
+final readonly class KernelRequestListener
 {
     public function __construct(
-        private readonly RouteStorageInterface $routeStorage,
+        private RouteStorageInterface $routeStorage,
     ) {
     }
 

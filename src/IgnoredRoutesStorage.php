@@ -7,10 +7,10 @@ namespace Tiime\TestedRoutesCheckerBundle;
 /**
  * @internal
  */
-final class IgnoredRoutesStorage
+final readonly class IgnoredRoutesStorage
 {
     public function __construct(
-        private readonly string $file,
+        private string $file,
     ) {
     }
 

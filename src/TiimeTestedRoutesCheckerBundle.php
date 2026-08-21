@@ -13,8 +13,8 @@ class TiimeTestedRoutesCheckerBundle extends AbstractBundle
 {
     public function configure(DefinitionConfigurator $definition): void
     {
-        /* @phpstan-ignore-next-line */
-        $definition->rootNode()
+        $definition
+            ->rootNode()
             ->children()
                 ->integerNode('maximum_number_of_routes_to_display')->defaultValue(25)->end()
                 ->scalarNode('routes_to_ignore_file')->defaultValue('%kernel.project_dir%/.tiime-trc-baseline')->end()
@@ -24,16 +24,16 @@ class TiimeTestedRoutesCheckerBundle extends AbstractBundle
     }
 
     /** @param array<string, mixed> $config */
-    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
+    public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void
     {
-        $container->import('../config/services.php');
+        $configurator->import('../config/services.php');
 
-        if ('test' === $container->env()) {
-            $container->import('../config/services_test.php');
+        if ('test' === $configurator->env()) {
+            $configurator->import('../config/services_test.php');
         }
 
-        $container->parameters()->set('tiime_tested_routes_checker_bundle.maximum_number_of_routes_to_display', $config['maximum_number_of_routes_to_display']);
-        $container->parameters()->set('tiime_tested_routes_checker_bundle.routes_to_ignore_file', $config['routes_to_ignore_file']);
-        $container->parameters()->set('tiime_tested_routes_checker_bundle.route_storage_file', $config['route_storage_file']);
+        $configurator->parameters()->set('tiime_tested_routes_checker_bundle.maximum_number_of_routes_to_display', $config['maximum_number_of_routes_to_display']);
+        $configurator->parameters()->set('tiime_tested_routes_checker_bundle.routes_to_ignore_file', $config['routes_to_ignore_file']);
+        $configurator->parameters()->set('tiime_tested_routes_checker_bundle.route_storage_file', $config['route_storage_file']);
     }
 }

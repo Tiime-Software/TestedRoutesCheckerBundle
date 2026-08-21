@@ -7,10 +7,10 @@ namespace Tiime\TestedRoutesCheckerBundle\RouteStorage;
 /**
  * @internal
  */
-final class FileRouteStorage implements RouteStorageInterface
+final readonly class FileRouteStorage implements RouteStorageInterface
 {
     public function __construct(
-        private readonly string $file,
+        private string $file,
     ) {
     }
 

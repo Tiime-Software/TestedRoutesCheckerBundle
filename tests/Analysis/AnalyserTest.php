@@ -10,7 +10,6 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Tiime\TestedRoutesCheckerBundle\Analysis\Analyser;
-use Tiime\TestedRoutesCheckerBundle\Analysis\AnalysisResult;
 use Tiime\TestedRoutesCheckerBundle\RouteStorage\RouteStorageInterface;
 
 final class AnalyserTest extends TestCase
@@ -27,21 +26,22 @@ final class AnalyserTest extends TestCase
 
         /** @var RouterInterface&MockObject $router */
         $router = $this->createMock(RouterInterface::class);
-        $router->expects($this->once())
-                ->method('getRouteCollection')
-                ->willReturn($routeCollection);
+        $router
+            ->expects($this->once())
+            ->method('getRouteCollection')
+            ->willReturn($routeCollection);
 
-        /** @®ar RouteStorageInterface&MockObject $routeStorage */
+        /** @var RouteStorageInterface&MockObject $routeStorage */
         $routeStorage = $this->createMock(RouteStorageInterface::class);
-        $routeStorage->expects($this->exactly(2))
-                ->method('getRoutes')
-                ->willReturn(['route1' => [200], 'route2' => [404]]);
+        $routeStorage
+            ->expects($this->exactly(2))
+            ->method('getRoutes')
+            ->willReturn(['route1' => [200], 'route2' => [404]]);
 
         $analyser = new Analyser($router, $routeStorage);
 
         $result = $analyser->run(['ignored_.*']);
 
-        $this->assertInstanceOf(AnalysisResult::class, $result);
         $this->assertSame(['route1', 'route2'], $result->getTestedRoutes());
         $this->assertSame(['route3'], $result->getNotTestedRoutes());
         $this->assertSame(['route1'], $result->getSuccessfullyTestedRoutes());

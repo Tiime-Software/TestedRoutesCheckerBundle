@@ -10,11 +10,11 @@ use Tiime\TestedRoutesCheckerBundle\RouteStorage\RouteStorageInterface;
 /**
  * @internal
  */
-class Analyser
+readonly class Analyser
 {
     public function __construct(
-        private readonly RouterInterface $router,
-        private readonly RouteStorageInterface $routeStorage,
+        private RouterInterface $router,
+        private RouteStorageInterface $routeStorage,
     ) {
     }
 
